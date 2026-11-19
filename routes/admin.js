@@ -92,7 +92,7 @@ router.post("/api/admin/login", wrap(async (req, res) => {
 
 router.post("/api/admin/logout", (req, res) => {
   req.session.destroy(() => {
-    res.clearCookie("rr.sid");
+    res.clearCookie("ss.sid");
     res.json({ ok: true });
   });
 });

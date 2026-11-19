@@ -1,8 +1,8 @@
 {
-  "name": "rocks-and-relics",
+  "name": "stardust-and-stoneworks",
   "version": "0.1.0",
   "private": true,
-  "description": "Rocks and Relics: stones, crystals, orbs, figures and raw specimens.",
+  "description": "Stardust & Stoneworks: stones, crystals, orbs, figures and raw specimens.",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

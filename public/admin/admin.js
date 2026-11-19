@@ -69,11 +69,11 @@
 
   // ---------- login ----------
   function renderLogin() {
-    document.title = "Log in · Rocks and Relics";
+    document.title = "Log in · Stardust & Stoneworks";
     app.innerHTML = `
       <div class="login-wrap">
         <form class="login" id="loginForm">
-          <div class="brand">${LOGO}<span>Rocks &amp; Relics Admin</span></div>
+          <div class="brand">${LOGO}<span>Stardust &amp; Stoneworks Admin</span></div>
           <div class="field"><label for="em">Email</label><input id="em" type="email" autocomplete="username" required /></div>
           <div class="field"><label for="pw">Password</label><input id="pw" type="password" autocomplete="current-password" required /></div>
           <button class="btn btn-primary" type="submit">Log in</button>
@@ -102,7 +102,7 @@
   function shell(active, inner) {
     app.innerHTML = `
       <header class="topbar">
-        <div class="brand">${LOGO}<span>Rocks &amp; Relics</span></div>
+        <div class="brand">${LOGO}<span>Stardust &amp; Stoneworks</span></div>
         <nav class="tabs">
           <a href="#/listings" class="${active === "listings" ? "active" : ""}">Listings</a>
           <a href="#/team" class="${active === "team" ? "active" : ""}">Team</a>
@@ -125,7 +125,7 @@
 
   // ---------- listings ----------
   async function renderListings() {
-    document.title = "Listings · Rocks and Relics";
+    document.title = "Listings · Stardust & Stoneworks";
     shell("listings", `<p class="muted">Loading listings…</p>`);
     const products = await api("/api/admin/products");
     const main = app.querySelector(".main");
@@ -179,7 +179,7 @@
 
   async function renderEditor(id) {
     const isNew = id === "new";
-    document.title = `${isNew ? "New listing" : "Edit listing"} · Rocks and Relics`;
+    document.title = `${isNew ? "New listing" : "Edit listing"} · Stardust & Stoneworks`;
     shell("listings", `<p class="muted">Loading…</p>`);
     const p = isNew
       ? { name: "", type: "orb", status: "draft", price_cents: 0, stock: 1, material: "", note: "", tag: "", description: "", style: "amethyst", images: [] }
@@ -318,7 +318,7 @@
 
   // ---------- team ----------
   async function renderTeam() {
-    document.title = "Team · Rocks and Relics";
+    document.title = "Team · Stardust & Stoneworks";
     shell("team", `<p class="muted">Loading…</p>`);
     const users = await api("/api/admin/users");
     const isOwner = me.role === "owner";
@@ -391,7 +391,7 @@
 
   // ---------- account ----------
   function renderAccount() {
-    document.title = "Account · Rocks and Relics";
+    document.title = "Account · Stardust & Stoneworks";
     shell("account", `
       <div class="page-head"><div><h1>Account</h1><p class="muted" style="margin:.25rem 0 0">${esc(me.name || "")} · ${esc(me.email)} · <span class="pill ${me.role}">${me.role}</span></p></div></div>
       <form class="panel" id="pwForm" style="max-width:460px">

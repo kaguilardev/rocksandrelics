@@ -1,4 +1,4 @@
-# Rocks and Relics
+# Stardust & Stoneworks
 
 Stones, crystals and rocks of every kind: shapes, figures, orbs, towers, clusters and raw specimens.
 

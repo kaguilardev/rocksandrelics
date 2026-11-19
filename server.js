@@ -32,7 +32,7 @@ app.use(express.json({ limit: "200kb" }));
 
 app.use(
   session({
-    name: "rr.sid",
+    name: "ss.sid",
     store: new PgSession({ pool, tableName: "session", createTableIfMissing: true }),
     secret: sessionSecret,
     resave: false,
@@ -84,7 +84,7 @@ async function start() {
     await migrate();
     await auth.bootstrapOwner();
   }
-  app.listen(PORT, () => console.log(`Rocks and Relics running on http://localhost:${PORT}`));
+  app.listen(PORT, () => console.log(`Stardust & Stoneworks running on http://localhost:${PORT}`));
 }
 
 start().catch((e) => {
