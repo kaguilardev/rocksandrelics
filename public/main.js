@@ -1,136 +1,144 @@
-// ---------- Products (placeholder catalog) ----------
-const products = [
-  { name: "Amethyst Orb",          type: "orb",     shape: "gem-orb",     mat: "amethyst",    price: 68,  note: "Brazil · 60mm sphere",           tag: "Bestseller" },
-  { name: "Aura Quartz Tower",     type: "tower",   shape: "gem-tower",   mat: "aura",        price: 54,  note: "Titanium-bonded · 4in point",    tag: "New" },
-  { name: "Rose Quartz Heart",     type: "figure",  shape: "gem-heart",   mat: "rose",        price: 32,  note: "Madagascar · hand-carved" },
-  { name: "Raw Labradorite",       type: "raw",     shape: "gem-raw",     mat: "labradorite", price: 26,  note: "Flashes teal & electric blue" },
-  { name: "Rainbow Fluorite Cluster", type: "cluster", shape: "gem-cluster", mat: "fluorite", price: 89,  note: "Natural formation · display piece", tag: "Rare" },
-  { name: "Galaxy Obsidian Sphere", type: "orb",    shape: "gem-orb",     mat: "galaxy",      price: 74,  note: "Silver-sheen inclusions" },
-  { name: "Moonstone Crescent",    type: "figure",  shape: "gem-moon",    mat: "moonstone",   price: 38,  note: "Blue-flash moonstone carving" },
-  { name: "Citrine Point",         type: "tower",   shape: "gem-tower",   mat: "citrine",     price: 46,  note: "Golden glow · polished" },
-  { name: "Malachite Egg",         type: "figure",  shape: "gem-egg",     mat: "malachite",   price: 58,  note: "Congo · banded green" },
-  { name: "Raw Black Obsidian",    type: "raw",     shape: "gem-raw",     mat: "obsidian",    price: 18,  note: "Volcanic glass · unpolished" },
-  { name: "Lapis Lazuli Pyramid",  type: "figure",  shape: "gem-pyramid", mat: "lapis",       price: 42,  note: "Golden pyrite flecks" },
-  { name: "Tiger's Eye Tumbled",   type: "raw",     shape: "gem-tumbled", mat: "tiger",       price: 9,   note: "Pocket stone · chatoyant" },
-];
+(() => {
+  "use strict";
 
-const grid = document.getElementById("productGrid");
-const cartCountEl = document.getElementById("cartCount");
-const cartBtn = document.querySelector(".cart");
-const toast = document.getElementById("toast");
-let cartCount = 0;
+  const SHAPES = { orb: "gem-orb", tower: "gem-tower", figure: "gem-heart", raw: "gem-raw", cluster: "gem-cluster" };
+  const TYPE_LABEL = { orb: "Orb", tower: "Tower", figure: "Figure", raw: "Raw stone", cluster: "Cluster" };
 
-function render(filter = "all") {
-  const list = filter === "all" ? products : products.filter((p) => p.type === filter);
-  grid.innerHTML = list
-    .map(
-      (p, i) => `
-      <article class="card" style="animation-delay:${i * 50}ms">
-        ${p.tag ? `<span class="tag">${p.tag}</span>` : ""}
-        <div class="card-art"><span class="gem ${p.shape} ${p.mat}"></span></div>
-        <div class="card-body">
-          <h3>${p.name}</h3>
-          <p>${p.note}</p>
-          <div class="card-foot">
-            <span class="price">$${p.price}</span>
-            <button class="add" type="button" data-name="${p.name}">Add to cart</button>
-          </div>
-        </div>
-      </article>`
-    )
-    .join("");
-}
+  const grid = document.getElementById("productGrid");
+  const cartCountEl = document.getElementById("cartCount");
+  const toastEl = document.getElementById("toast");
+  const modal = document.getElementById("productModal");
+  const pmBody = document.getElementById("pmBody");
 
-function setFilter(filter) {
-  document.querySelectorAll(".chip").forEach((c) => {
-    const on = c.dataset.filter === filter;
-    c.classList.toggle("active", on);
-    c.setAttribute("aria-selected", on);
-  });
-  render(filter);
-}
+  let products = [];
+  let filter = "all";
+  let cartCount = 0;
 
-let toastTimer;
-function showToast(msg) {
-  toast.textContent = msg;
-  toast.classList.add("show");
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => toast.classList.remove("show"), 2200);
-}
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const money = (cents) => `$${(cents / 100).toFixed(2).replace(/\.00$/, "")}`;
+  const gem = (p) => `<span class="gem ${SHAPES[p.type] || "gem-raw"} ${esc(p.style)}"></span>`;
 
-document.querySelectorAll(".chip").forEach((c) =>
-  c.addEventListener("click", () => setFilter(c.dataset.filter))
-);
-
-document.querySelectorAll(".collection").forEach((c) =>
-  c.addEventListener("click", () => {
-    setFilter(c.dataset.filter);
-    document.getElementById("shop").scrollIntoView({ behavior: "smooth" });
-  })
-);
-
-grid.addEventListener("click", (e) => {
-  const btn = e.target.closest(".add");
-  if (!btn) return;
-  cartCount++;
-  cartCountEl.textContent = cartCount;
-  cartBtn.classList.remove("bump");
-  void cartBtn.offsetWidth;
-  cartBtn.classList.add("bump");
-  showToast(`✦ ${btn.dataset.name} added to your cart`);
-});
-
-document.getElementById("signupForm").addEventListener("submit", (e) => {
-  e.preventDefault();
-  document.getElementById("formNote").textContent = "✦ You're on the list. Watch the skies (and your inbox).";
-  e.target.reset();
-});
-
-document.getElementById("year").textContent = new Date().getFullYear();
-render();
-
-// ---------- Starfield ----------
-(function stars() {
-  const canvas = document.getElementById("stars");
-  const ctx = canvas.getContext("2d");
-  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const colors = ["#ffffff", "#7cf5ff", "#b48cff", "#8fd3ff", "#ff9ee8"];
-  let w, h, dpr, field = [];
-
-  function resize() {
-    dpr = Math.min(window.devicePixelRatio || 1, 2);
-    w = canvas.width = innerWidth * dpr;
-    h = canvas.height = innerHeight * dpr;
-    const count = Math.round((innerWidth * innerHeight) / 4500);
-    field = Array.from({ length: count }, () => ({
-      x: Math.random() * w,
-      y: Math.random() * h,
-      r: (Math.random() * 1.2 + 0.2) * dpr,
-      c: colors[Math.random() < 0.75 ? 0 : Math.floor(Math.random() * colors.length)],
-      t: Math.random() * Math.PI * 2,
-      s: 0.005 + Math.random() * 0.02,
-      v: 0.02 + Math.random() * 0.08,
-    }));
+  let toastTimer;
+  function toast(msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toastEl.classList.remove("show"), 2200);
   }
 
-  function draw() {
-    ctx.clearRect(0, 0, w, h);
-    for (const st of field) {
-      st.t += st.s;
-      if (!reduce) {
-        st.y -= st.v * dpr;
-        if (st.y < 0) st.y = h;
-      }
-      ctx.globalAlpha = 0.35 + Math.abs(Math.sin(st.t)) * 0.65;
-      ctx.fillStyle = st.c;
-      ctx.beginPath();
-      ctx.arc(st.x, st.y, st.r, 0, Math.PI * 2);
-      ctx.fill();
+  function render() {
+    grid.setAttribute("aria-busy", "false");
+    if (!products.length) {
+      grid.innerHTML = `<div class="grid-empty"><strong style="color:var(--text)">New pieces are on their way.</strong><br />Subscribe below to hear when the first collection drops.</div>`;
+      return;
     }
-    if (!reduce) requestAnimationFrame(draw);
+    const list = filter === "all" ? products : products.filter((p) => p.type === filter);
+    if (!list.length) {
+      grid.innerHTML = `<div class="grid-empty">Nothing in this collection right now. Check back soon.</div>`;
+      return;
+    }
+    grid.innerHTML = list
+      .map((p) => {
+        const sold = p.status === "sold" || p.stock === 0;
+        const badge = sold ? `<span class="tag sold">Sold out</span>` : p.tag ? `<span class="tag">${esc(p.tag)}</span>` : "";
+        return `
+        <button class="card" type="button" data-slug="${esc(p.slug)}">
+          <div class="card-art">
+            ${badge}
+            ${p.images.length ? `<img src="/img/${p.images[0]}" alt="${esc(p.name)}" loading="lazy" />` : gem(p)}
+          </div>
+          <div class="card-body">
+            <h3>${esc(p.name)}</h3>
+            ${p.note ? `<p>${esc(p.note)}</p>` : ""}
+            <span class="price">${money(p.price_cents)}</span>
+          </div>
+        </button>`;
+      })
+      .join("");
   }
 
-  resize();
-  draw();
-  addEventListener("resize", () => { resize(); if (reduce) draw(); });
+  function setFilter(next) {
+    filter = next;
+    document.querySelectorAll(".chip").forEach((c) => {
+      const on = c.dataset.filter === next;
+      c.classList.toggle("active", on);
+      c.setAttribute("aria-selected", on);
+    });
+    render();
+  }
+
+  function openProduct(slug) {
+    const p = products.find((x) => x.slug === slug);
+    if (!p) return;
+    const sold = p.status === "sold" || p.stock === 0;
+    const meta = [TYPE_LABEL[p.type], p.material].filter(Boolean).map(esc).join(" · ");
+    pmBody.innerHTML = `
+      <div class="pm-gallery">
+        <div class="pm-main" id="pmMain">${p.images.length ? `<img src="/img/${p.images[0]}" alt="${esc(p.name)}" />` : gem(p)}</div>
+        ${p.images.length > 1 ? `<div class="pm-thumbs">${p.images.map((id, i) => `<button type="button" data-img="${id}" class="${i === 0 ? "on" : ""}" aria-label="Photo ${i + 1}"><img src="/img/${id}" alt="" loading="lazy" /></button>`).join("")}</div>` : ""}
+      </div>
+      <div class="pm-info">
+        <span class="pm-meta">${meta}</span>
+        <h3 id="pmTitle">${esc(p.name)}</h3>
+        ${p.note ? `<span class="pm-meta">${esc(p.note)}</span>` : ""}
+        <span class="pm-price">${money(p.price_cents)}</span>
+        ${p.description ? `<p class="pm-desc">${esc(p.description)}</p>` : ""}
+        <button class="btn btn-primary" type="button" data-add="${esc(p.name)}" ${sold ? "disabled" : ""}>${sold ? "Sold out" : "Add to cart"}</button>
+      </div>`;
+    pmBody.querySelectorAll("[data-img]").forEach((b) =>
+      b.addEventListener("click", () => {
+        pmBody.querySelectorAll("[data-img]").forEach((x) => x.classList.toggle("on", x === b));
+        document.getElementById("pmMain").innerHTML = `<img src="/img/${b.dataset.img}" alt="${esc(p.name)}" />`;
+      })
+    );
+    if (!modal.open) modal.showModal();
+    history.replaceState(null, "", `#item-${p.slug}`);
+  }
+
+  // ---------- events ----------
+  document.querySelectorAll(".chip").forEach((c) => c.addEventListener("click", () => setFilter(c.dataset.filter)));
+  document.querySelectorAll(".collection").forEach((c) =>
+    c.addEventListener("click", () => {
+      setFilter(c.dataset.filter);
+      document.getElementById("shop").scrollIntoView({ behavior: "smooth" });
+    })
+  );
+  grid.addEventListener("click", (e) => {
+    const card = e.target.closest(".card");
+    if (card) openProduct(card.dataset.slug);
+  });
+
+  modal.querySelector(".modal-close").addEventListener("click", () => modal.close());
+  modal.addEventListener("click", (e) => { if (e.target === modal) modal.close(); });
+  modal.addEventListener("close", () => {
+    if (location.hash.startsWith("#item-")) history.replaceState(null, "", location.pathname);
+  });
+  pmBody.addEventListener("click", (e) => {
+    const add = e.target.closest("[data-add]");
+    if (!add || add.disabled) return;
+    cartCount++;
+    cartCountEl.textContent = cartCount;
+    cartCountEl.hidden = false;
+    toast(`${add.dataset.add} added to cart`);
+  });
+
+  document.getElementById("signupForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    document.getElementById("formNote").textContent = "Thanks! You're on the list.";
+    e.target.reset();
+  });
+
+  document.getElementById("year").textContent = new Date().getFullYear();
+
+  // ---------- load ----------
+  grid.innerHTML = Array.from({ length: 4 }, () => `<div class="skeleton"></div>`).join("");
+  fetch("/api/products")
+    .then((r) => (r.ok ? r.json() : []))
+    .catch(() => [])
+    .then((data) => {
+      products = Array.isArray(data) ? data : [];
+      render();
+      const m = location.hash.match(/^#item-(.+)$/);
+      if (m) openProduct(decodeURIComponent(m[1]));
+    });
 })();

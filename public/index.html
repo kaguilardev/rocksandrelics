@@ -3,144 +3,133 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Rocks and Relics · Crystals, Stones &amp; Cosmic Treasures</title>
-  <meta name="description" content="Rocks and Relics: every stone, crystal and rock your heart could desire. Orbs, towers, carved figures, clusters and raw specimens." />
-  <meta name="theme-color" content="#07050f" />
+  <title>Rocks and Relics · Crystals, Stones &amp; Minerals</title>
+  <meta name="description" content="Rocks and Relics: every stone, crystal and rock you could want. Orbs, towers, carved figures, clusters and raw specimens." />
+  <meta name="theme-color" content="#0b0a10" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
-  <canvas id="stars" aria-hidden="true"></canvas>
-  <div class="nebula" aria-hidden="true"></div>
-
   <header class="nav">
-    <a href="#top" class="brand" aria-label="Rocks and Relics home">
-      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
-        <defs>
-          <linearGradient id="bm" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stop-color="#7cf5ff" />
-            <stop offset=".5" stop-color="#b48cff" />
-            <stop offset="1" stop-color="#ff9ee8" />
-          </linearGradient>
-        </defs>
-        <path d="M16 2 L27 11 L22 29 L10 29 L5 11 Z" fill="none" stroke="url(#bm)" stroke-width="1.6" />
-        <path d="M5 11 L27 11 M16 2 L12 11 L16 29 L20 11 Z" fill="none" stroke="url(#bm)" stroke-width="1" opacity=".7" />
-      </svg>
-      <span>Rocks <em>&amp;</em> Relics</span>
-    </a>
-    <nav class="links" aria-label="Main">
-      <a href="#collections">Collections</a>
-      <a href="#shop">Shop</a>
-      <a href="#about">Our Story</a>
-    </nav>
-    <button class="cart" type="button" aria-label="Cart">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 7h12l-1.2 12.2a1 1 0 0 1-1 .8H8.2a1 1 0 0 1-1-.8z M9 7a3 3 0 0 1 6 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-      <span class="cart-count" id="cartCount">0</span>
-    </button>
+    <div class="wrap nav-inner">
+      <a href="/" class="brand" aria-label="Rocks and Relics home">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <defs><linearGradient id="bm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2dd4bf"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient></defs>
+          <path d="M16 3 L27 11.5 L22 29 L10 29 L5 11.5 Z" fill="none" stroke="url(#bm)" stroke-width="1.8" />
+          <path d="M5 11.5 L27 11.5 M16 3 L12 11.5 L16 29 L20 11.5 Z" fill="none" stroke="url(#bm)" stroke-width="1.1" opacity=".7" />
+        </svg>
+        <span>Rocks &amp; Relics</span>
+      </a>
+      <nav class="links" aria-label="Main">
+        <a href="#shop">Shop</a>
+        <a href="#collections">Collections</a>
+        <a href="#about">About</a>
+      </nav>
+      <button class="cart" type="button" aria-label="Cart">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 7h12l-1.2 12.2a1 1 0 0 1-1 .8H8.2a1 1 0 0 1-1-.8z M9 7a3 3 0 0 1 6 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <span class="cart-count" id="cartCount" hidden>0</span>
+      </button>
+    </div>
   </header>
 
-  <main id="top">
-    <!-- HERO -->
+  <main>
     <section class="hero">
-      <div class="hero-copy">
-        <p class="eyebrow">Stones · Crystals · Cosmic curiosities</p>
-        <h1>Treasures pulled<br /><span class="shimmer">from the stars.</span></h1>
-        <p class="lede">Every stone, crystal and rock your heart could desire, from polished orbs and carved figures to towers, clusters and raw earth straight from the source.</p>
-        <div class="cta-row">
-          <a href="#shop" class="btn btn-primary">Explore the collection</a>
-          <a href="#collections" class="btn btn-ghost">Browse by form</a>
+      <div class="wrap hero-inner">
+        <div class="hero-copy">
+          <p class="eyebrow">Crystals · Stones · Minerals</p>
+          <h1>Every stone you could want, <span class="accent">in every form.</span></h1>
+          <p class="lede">Polished orbs, towers, carved figures, clusters and raw specimens, each one chosen by hand and photographed as it is.</p>
+          <div class="cta-row">
+            <a href="#shop" class="btn btn-primary">Shop the collection</a>
+            <a href="#collections" class="btn btn-ghost">Browse by form</a>
+          </div>
         </div>
-      </div>
-      <div class="hero-orb" aria-hidden="true">
-        <div class="orb-glow"></div>
-        <div class="orb">
-          <div class="orb-swirl"></div>
-          <div class="orb-shine"></div>
+        <div class="hero-art" aria-hidden="true">
+          <div class="tile t1"><span class="gem gem-orb amethyst"></span></div>
+          <div class="tile t2"><span class="gem gem-tower aura"></span></div>
+          <div class="tile t3"><span class="gem gem-raw labradorite"></span></div>
         </div>
-        <div class="ring"></div>
-        <span class="spark s1"></span><span class="spark s2"></span><span class="spark s3"></span>
       </div>
     </section>
 
-    <!-- MARQUEE -->
-    <div class="marquee" aria-hidden="true">
-      <div class="track">
-        <span>Amethyst</span><i>✦</i><span>Labradorite</span><i>✦</i><span>Rose Quartz</span><i>✦</i><span>Obsidian</span><i>✦</i><span>Fluorite</span><i>✦</i><span>Moonstone</span><i>✦</i><span>Malachite</span><i>✦</i><span>Citrine</span><i>✦</i><span>Aura Quartz</span><i>✦</i><span>Tiger's Eye</span><i>✦</i>
-        <span>Amethyst</span><i>✦</i><span>Labradorite</span><i>✦</i><span>Rose Quartz</span><i>✦</i><span>Obsidian</span><i>✦</i><span>Fluorite</span><i>✦</i><span>Moonstone</span><i>✦</i><span>Malachite</span><i>✦</i><span>Citrine</span><i>✦</i><span>Aura Quartz</span><i>✦</i><span>Tiger's Eye</span><i>✦</i>
-      </div>
-    </div>
-
-    <!-- COLLECTIONS -->
     <section id="collections" class="section">
-      <div class="section-head">
-        <p class="eyebrow">Shop by form</p>
-        <h2>Every shape the earth can take</h2>
-      </div>
-      <div class="collections">
-        <button class="collection" data-filter="orb"><span class="gem gem-orb amethyst"></span><strong>Orbs &amp; Spheres</strong><small>Polished worlds in your palm</small></button>
-        <button class="collection" data-filter="tower"><span class="gem gem-tower aura"></span><strong>Towers &amp; Points</strong><small>Focused, upright energy</small></button>
-        <button class="collection" data-filter="figure"><span class="gem gem-heart rose"></span><strong>Figures &amp; Shapes</strong><small>Hearts, moons, carvings</small></button>
-        <button class="collection" data-filter="raw"><span class="gem gem-raw labradorite"></span><strong>Raw Stones</strong><small>Untouched, straight from earth</small></button>
-        <button class="collection" data-filter="cluster"><span class="gem gem-cluster fluorite"></span><strong>Clusters &amp; Geodes</strong><small>Crystal cities, cracked open</small></button>
+      <div class="wrap">
+        <div class="section-head"><h2>Shop by form</h2></div>
+        <div class="collections">
+          <button class="collection" data-filter="orb"><span class="gem gem-orb amethyst"></span><span><strong>Orbs &amp; Spheres</strong><small>Polished and round</small></span></button>
+          <button class="collection" data-filter="tower"><span class="gem gem-tower aura"></span><span><strong>Towers &amp; Points</strong><small>Standing crystals</small></span></button>
+          <button class="collection" data-filter="figure"><span class="gem gem-heart rose"></span><span><strong>Figures &amp; Shapes</strong><small>Hearts, moons, carvings</small></span></button>
+          <button class="collection" data-filter="raw"><span class="gem gem-raw labradorite"></span><span><strong>Raw Stones</strong><small>Natural and unpolished</small></span></button>
+          <button class="collection" data-filter="cluster"><span class="gem gem-cluster fluorite"></span><span><strong>Clusters &amp; Geodes</strong><small>Natural formations</small></span></button>
+        </div>
       </div>
     </section>
 
-    <!-- SHOP -->
     <section id="shop" class="section">
-      <div class="section-head row">
+      <div class="wrap">
+        <div class="section-head row">
+          <h2>New arrivals</h2>
+          <div class="filters" role="tablist" aria-label="Filter products">
+            <button class="chip active" data-filter="all" role="tab" aria-selected="true">All</button>
+            <button class="chip" data-filter="orb" role="tab" aria-selected="false">Orbs</button>
+            <button class="chip" data-filter="tower" role="tab" aria-selected="false">Towers</button>
+            <button class="chip" data-filter="figure" role="tab" aria-selected="false">Figures</button>
+            <button class="chip" data-filter="raw" role="tab" aria-selected="false">Raw</button>
+            <button class="chip" data-filter="cluster" role="tab" aria-selected="false">Clusters</button>
+          </div>
+        </div>
+        <div class="grid" id="productGrid" aria-busy="true"></div>
+      </div>
+    </section>
+
+    <section id="about" class="section">
+      <div class="wrap about">
         <div>
-          <p class="eyebrow">The collection</p>
-          <h2>Newly unearthed</h2>
+          <h2>Chosen by hand.</h2>
         </div>
-        <div class="filters" role="tablist" aria-label="Filter products">
-          <button class="chip active" data-filter="all" role="tab" aria-selected="true">All</button>
-          <button class="chip" data-filter="orb" role="tab" aria-selected="false">Orbs</button>
-          <button class="chip" data-filter="tower" role="tab" aria-selected="false">Towers</button>
-          <button class="chip" data-filter="figure" role="tab" aria-selected="false">Figures</button>
-          <button class="chip" data-filter="raw" role="tab" aria-selected="false">Raw</button>
-          <button class="chip" data-filter="cluster" role="tab" aria-selected="false">Clusters</button>
+        <div>
+          <p>Rocks and Relics started with a simple love of stones: the weight of them, the color, the way light moves through them. We work with trusted miners and carvers and pick every piece ourselves.</p>
+          <ul class="promises">
+            <li>Ethically sourced specimens</li>
+            <li>Every piece photographed and inspected</li>
+            <li>Carefully packed and insured shipping</li>
+          </ul>
         </div>
-      </div>
-      <div class="grid" id="productGrid"><!-- filled by main.js --></div>
-    </section>
-
-    <!-- ABOUT -->
-    <section id="about" class="section about">
-      <div class="about-card">
-        <p class="eyebrow">Our story</p>
-        <h2>Curated by hand, chosen by feel.</h2>
-        <p>Rocks and Relics began with one simple obsession: the moment light catches a stone and something ancient looks back. We gather pieces from trusted miners and carvers around the world, chosen one by one for their color, character and quiet magic.</p>
-        <ul class="promises">
-          <li><span>✦</span> Ethically sourced specimens</li>
-          <li><span>✦</span> Every piece photographed and inspected</li>
-          <li><span>✦</span> Packed with care, shipped with intention</li>
-        </ul>
       </div>
     </section>
 
-    <!-- NEWSLETTER -->
     <section class="section signup">
-      <h2>Join the <span class="shimmer">constellation</span></h2>
-      <p>New drops, rare finds and moon-phase restocks, delivered to your inbox.</p>
-      <form class="signup-form" id="signupForm">
-        <label class="sr-only" for="email">Email address</label>
-        <input id="email" type="email" placeholder="you@example.com" required />
-        <button class="btn btn-primary" type="submit">Notify me</button>
-      </form>
-      <p class="form-note" id="formNote" role="status"></p>
+      <div class="wrap signup-inner">
+        <div>
+          <h2>New drops, first.</h2>
+          <p>Restocks and rare finds, straight to your inbox.</p>
+        </div>
+        <form class="signup-form" id="signupForm">
+          <label class="sr-only" for="email">Email address</label>
+          <input id="email" type="email" placeholder="you@example.com" required />
+          <button class="btn btn-primary" type="submit">Subscribe</button>
+        </form>
+      </div>
+      <p class="form-note wrap" id="formNote" role="status"></p>
     </section>
   </main>
 
   <footer class="footer">
-    <span>© <span id="year"></span> Rocks and Relics</span>
-    <span class="footer-tag">Made of stardust &amp; stone</span>
+    <div class="wrap footer-inner">
+      <span>© <span id="year"></span> Rocks and Relics</span>
+      <a href="/admin" class="muted-link">Staff login</a>
+    </div>
   </footer>
 
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <dialog class="modal" id="productModal" aria-labelledby="pmTitle">
+    <button class="modal-close" type="button" aria-label="Close">✕</button>
+    <div class="modal-body" id="pmBody"></div>
+  </dialog>
 
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <script src="/main.js"></script>
 </body>
 </html>
