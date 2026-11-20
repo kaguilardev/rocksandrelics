@@ -551,7 +551,7 @@
       <div class="channel-head">
         <div>
           <h2 style="margin:0">Sales sync</h2>
-          <p class="muted" style="margin:.2rem 0 0">When something sells on ${connected.map((c) => esc(c.name)).join(" or ")}, its stock here drops and the other marketplace is updated, so it can't sell twice. Checks every 10 minutes.${lastSync ? ` Last check ${timeAgo(lastSync)}.` : ""}</p>
+          <p class="muted" style="margin:.2rem 0 0">When something sells on ${connected.map((c) => esc(c.name)).join(" or ")}, its stock here drops${connected.length > 1 ? " and the other marketplace is updated" : " and the item is marked sold out when none are left"}, so it can't sell twice. Checks every 10 minutes.${lastSync ? ` Last check ${timeAgo(lastSync)}.` : ""}</p>
           ${connected.filter((c) => !c.sales_sync).map((c) => `<p class="error" style="margin:.3rem 0 0">${esc(c.name)} was connected before sales sync existed. ${me.role === "owner" ? "Click Reconnect below" : "Ask the owner to reconnect it"} to turn it on.</p>`).join("")}
         </div>
         <div class="channel-acts"><button class="btn btn-sm" id="syncNow">Sync now</button></div>

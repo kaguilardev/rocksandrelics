@@ -125,6 +125,18 @@ function missingSettings(settings) {
   return missing;
 }
 
+/** "Ready to ship, 1-3 days" from whichever processing-time fields Etsy returns. */
+function readinessLabel(x) {
+  const kind = x.readiness_state === "made_to_order" ? "Made to order" : "Ready to ship";
+  const pick = (re) => { const k = Object.keys(x).find((key) => re.test(key) && Number.isFinite(Number(x[key]))); return k ? Number(x[k]) : null; };
+  const min = pick(/^min_processing/);
+  const max = pick(/^max_processing/);
+  const unit = x.processing_time_unit || (Object.keys(x).some((k) => /weeks/.test(k)) ? "weeks" : "days");
+  if (min == null && max == null) return `${kind} (#${x.readiness_state_id})`;
+  const range = min != null && max != null && min !== max ? `${min}-${max}` : String(max ?? min);
+  return `${kind}, ${range} ${unit}`;
+}
+
 /** Shop-specific choices for the settings form. Each list fails soft so one bad call doesn't block the rest. */
 async function options(account) {
   const shop = account.account_id;
@@ -143,7 +155,7 @@ async function options(account) {
     })),
     readiness_states: list(readiness, (x) => ({
       id: String(x.readiness_state_id),
-      name: `${x.readiness_state === "ready_to_ship" ? "Ready to ship" : "Made to order"}, ${x.min_processing_time}-${x.max_processing_time} ${x.processing_time_unit || "days"}`,
+      name: readinessLabel(x),
     })),
     who_made: WHO_MADE,
     when_made: WHEN_MADE,
