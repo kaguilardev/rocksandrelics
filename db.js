@@ -100,6 +100,20 @@ async function migrate() {
       PRIMARY KEY (channel, line_id)
     );
     CREATE INDEX IF NOT EXISTS marketplace_sales_recent_idx ON marketplace_sales(sold_at DESC);
+
+    -- Messages sent through the website's contact form
+    CREATE TABLE IF NOT EXISTS contact_messages (
+      id           SERIAL PRIMARY KEY,
+      name         TEXT NOT NULL,
+      email        TEXT NOT NULL,
+      topic        TEXT NOT NULL DEFAULT '',
+      message      TEXT NOT NULL,
+      read_at      TIMESTAMPTZ,
+      emailed_at   TIMESTAMPTZ,
+      email_error  TEXT,
+      created_at   TIMESTAMPTZ NOT NULL DEFAULT now()
+    );
+    CREATE INDEX IF NOT EXISTS contact_messages_recent_idx ON contact_messages(created_at DESC);
   `);
 }
 

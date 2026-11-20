@@ -41,6 +41,7 @@
             </select>
           </div>
           <div class="full"><label class="lbl" for="cMsg">Message</label><textarea class="field" id="cMsg" name="message" required></textarea></div>
+          <div class="full" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden"><label for="cWebsite">Leave this empty</label><input id="cWebsite" name="website" tabindex="-1" autocomplete="off" /></div>
           <div class="full"><button class="btn btn-primary" type="submit">Send message</button><p class="note" id="contactNote" role="status"></p></div>
         </form>
       </div>
@@ -62,11 +63,30 @@
   <footer id="site-footer"></footer>
   <script src="/js/site.js"></script>
   <script>
-    document.getElementById("contactForm").addEventListener("submit", (e) => {
+    document.getElementById("contactForm").addEventListener("submit", async (e) => {
       e.preventDefault();
-      // TODO: connect to an email service or backend route so messages actually reach the studio.
-      document.getElementById("contactNote").textContent = "Thanks! Your message is on its way. ✦";
-      e.target.reset();
+      const form = e.target;
+      const note = document.getElementById("contactNote");
+      const btn = form.querySelector("button[type=submit]");
+      btn.disabled = true;
+      btn.textContent = "Sending…";
+      note.textContent = "";
+      try {
+        const res = await fetch("/api/contact", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(Object.fromEntries(new FormData(form).entries())),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || "Your message couldn't be sent. Please try again.");
+        note.textContent = "Thanks! Your message is on its way. We'll reply by email soon. ✦";
+        form.reset();
+      } catch (err) {
+        note.textContent = err.message && err.message !== "Failed to fetch" ? err.message : "Your message couldn't be sent. Please check your connection and try again.";
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Send message";
+      }
     });
   </script>
 </body>

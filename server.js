@@ -54,6 +54,7 @@ app.use(require("./routes/public"));
 app.use(require("./routes/admin"));
 app.use(require("./routes/marketplaces"));
 app.use(checkout.router);
+app.use(require("./routes/contact"));
 
 // Admin single-page app
 app.get(["/admin", "/admin/"], (_req, res) => {

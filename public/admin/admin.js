@@ -105,6 +105,7 @@
         <div class="brand">${LOGO}<span>Stardust &amp; Stoneworks</span></div>
         <nav class="tabs">
           <a href="#/listings" class="${active === "listings" ? "active" : ""}">Listings</a>
+          <a href="#/messages" class="${active === "messages" ? "active" : ""}">Messages <span class="tab-count" id="unreadCount" hidden></span></a>
           <a href="#/channels" class="${active === "channels" ? "active" : ""}">Channels</a>
           <a href="#/team" class="${active === "team" ? "active" : ""}">Team</a>
           <a href="#/account" class="${active === "account" ? "active" : ""}">Account</a>
@@ -116,6 +117,7 @@
         </div>
       </header>
       <main class="main">${inner}</main>`;
+    refreshUnread();
     document.getElementById("logout").onclick = async () => {
       await api("/api/admin/logout", { method: "POST" }).catch(() => {});
       me = null;
@@ -814,6 +816,81 @@
     };
   }
 
+  // ---------- messages (contact form) ----------
+  function setUnread(n) {
+    const el = document.getElementById("unreadCount");
+    if (!el) return;
+    el.textContent = n;
+    el.hidden = !n;
+  }
+  function refreshUnread() {
+    api("/api/admin/messages/unread").then((r) => setUnread(r.unread)).catch(() => {});
+  }
+
+  async function renderMessages() {
+    document.title = "Messages · Stardust & Stoneworks";
+    shell("messages", `<p class="muted">Loading messages…</p>`);
+    const { messages, email } = await api("/api/admin/messages");
+    const main = app.querySelector(".main");
+    const unread = () => messages.filter((m) => !m.read_at).length;
+
+    const draw = () => {
+      setUnread(unread());
+      main.innerHTML = `
+        <div class="page-head">
+          <div><h1>Messages</h1><p class="muted" style="margin:.25rem 0 0">From the contact form on your site · ${messages.length} total${unread() ? ` · ${unread()} unread` : ""}</p></div>
+        </div>
+        ${email.ready ? "" : `<div class="panel" style="margin-bottom:1rem"><strong>Email alerts are off.</strong> <span class="muted">Messages are saved here, but nothing is emailed to you yet. Set <code>RESEND_API_KEY</code> and <code>CONTACT_TO_EMAIL</code> in Render to get each one in your inbox too.</span></div>`}
+        ${messages.length ? `<div class="msg-list">${messages.map((m) => `
+          <details class="msg panel${m.read_at ? "" : " unread"}" data-id="${m.id}">
+            <summary>
+              <span class="msg-from"><strong>${esc(m.name)}</strong> <span class="muted">${esc(m.email)}</span></span>
+              <span class="msg-topic">${esc(m.topic)}</span>
+              <span class="msg-when muted">${timeAgo(m.created_at)}</span>
+            </summary>
+            <div class="msg-body">${esc(m.message)}</div>
+            ${m.email_error ? `<p class="error" style="margin:.5rem 0 0">Email alert failed: ${esc(m.email_error)}</p>` : ""}
+            <div class="msg-acts">
+              <a class="btn btn-sm btn-primary" href="mailto:${encodeURIComponent(m.email)}?subject=${encodeURIComponent("Re: " + m.topic)}">Reply by email</a>
+              <button class="btn btn-sm" type="button" data-act="toggle">${m.read_at ? "Mark unread" : "Mark read"}</button>
+              <button class="btn btn-sm" type="button" data-act="delete">Delete</button>
+            </div>
+          </details>`).join("")}</div>`
+        : `<div class="panel empty">No messages yet. When someone uses the contact form on your site, it shows up here.</div>`}`;
+
+      main.querySelectorAll("details.msg").forEach((d) => {
+        const m = messages.find((x) => String(x.id) === d.dataset.id);
+        d.addEventListener("toggle", async () => {
+          if (!d.open || m.read_at) return;
+          m.read_at = new Date().toISOString();
+          d.classList.remove("unread");
+          d.querySelector('[data-act="toggle"]').textContent = "Mark unread";
+          setUnread(unread());
+          api(`/api/admin/messages/${m.id}`, { method: "PATCH", body: { read: true } }).catch((ex) => toast(ex.message, true));
+        });
+        d.querySelector('[data-act="toggle"]').onclick = async () => {
+          const read = !m.read_at;
+          try {
+            await api(`/api/admin/messages/${m.id}`, { method: "PATCH", body: { read } });
+            m.read_at = read ? new Date().toISOString() : null;
+            draw();
+          } catch (ex) { toast(ex.message, true); }
+        };
+        d.querySelector('[data-act="delete"]').onclick = async (e) => {
+          const btn = e.currentTarget;
+          if (btn.dataset.confirm !== "1") { btn.dataset.confirm = "1"; btn.textContent = "Click again to delete"; return; }
+          try {
+            await api(`/api/admin/messages/${m.id}`, { method: "DELETE" });
+            messages.splice(messages.indexOf(m), 1);
+            draw();
+            toast("Message deleted");
+          } catch (ex) { toast(ex.message, true); }
+        };
+      });
+    };
+    draw();
+  }
+
   // ---------- router ----------
   async function route() {
     if (!me) return renderLogin();
@@ -821,6 +898,7 @@
     const parts = (path || "listings").split("/");
     try {
       if (parts[0] === "listings" && parts[1]) await renderEditor(parts[1]);
+      else if (parts[0] === "messages") await renderMessages();
       else if (parts[0] === "channels") await renderChannels(new URLSearchParams(qs));
       else if (parts[0] === "team") await renderTeam();
       else if (parts[0] === "account") renderAccount();

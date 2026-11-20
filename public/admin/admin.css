@@ -65,7 +65,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
   padding: .8rem 1.5rem; background: rgba(11,10,16,.9); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line);
 }
 .tabs { display: flex; gap: .25rem; flex: 1; }
-.tabs a { padding: .45rem .8rem; border-radius: 8px; text-decoration: none; color: var(--muted); font-weight: 500; }
+.tabs a { white-space: nowrap; padding: .45rem .8rem; border-radius: 8px; text-decoration: none; color: var(--muted); font-weight: 500; }
 .tabs a:hover { color: var(--text); background: var(--panel-2); }
 .tabs a.active { color: var(--text); background: var(--panel-2); }
 .who { display: flex; align-items: center; gap: .75rem; color: var(--muted); font-size: .85rem; }
@@ -171,3 +171,24 @@ label.check input { width: auto; }
 /* sales sync */
 .sales { margin-bottom: 1rem; }
 .sales-table { margin-top: 1rem; background: var(--bg); }
+
+/* Messages (contact form) */
+.tab-count { display: inline-block; min-width: 1.2rem; padding: 0 .35rem; margin-left: .2rem; border-radius: 999px; background: var(--accent-2); color: #000; font-size: .7rem; font-weight: 700; line-height: 1.2rem; text-align: center; }
+.tab-count[hidden] { display: none; }
+.msg-list { display: grid; gap: .6rem; }
+.msg { padding: 0; }
+.msg summary { display: grid; grid-template-columns: 1fr auto auto; gap: 1rem; align-items: center; padding: .9rem 1.1rem; cursor: pointer; list-style: none; }
+.msg summary::-webkit-details-marker { display: none; }
+.msg.unread { border-color: var(--accent-2); }
+.msg.unread .msg-from strong::before { content: ""; display: inline-block; width: .5rem; height: .5rem; margin-right: .45rem; border-radius: 50%; background: var(--accent-2); vertical-align: middle; }
+.msg:not(.unread) .msg-from strong { font-weight: 500; }
+.msg-topic { font-size: .82rem; color: var(--muted); }
+.msg-when { font-size: .82rem; white-space: nowrap; }
+.msg-body { padding: 0 1.1rem; white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.55; }
+.msg .error { padding: 0 1.1rem; }
+.msg-acts { display: flex; flex-wrap: wrap; gap: .5rem; padding: 1rem 1.1rem 1.1rem; }
+@media (max-width: 640px) {
+  .msg summary { grid-template-columns: 1fr auto; }
+  .msg-topic { display: none; }
+}
+.msg-list .panel + .panel { margin-top: 0; }

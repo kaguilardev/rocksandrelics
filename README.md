@@ -45,6 +45,18 @@ The cart's **Checkout** button sends buyers to a Stripe-hosted payment page. Pri
 
 When a payment succeeds, the webhook takes the items off stock (marking one-of-a-kind pieces **Sold out**) and passes the new stock to Etsy and eBay. Orders and customer details are in the Stripe Dashboard under **Payments**. Until `STRIPE_SECRET_KEY` is set, the cart shows "Checkout coming soon".
 
+## Contact form messages
+
+Every message sent through the contact page is saved and shows up in **Admin → Messages** (with an unread count on the tab). Open one to mark it read, or use **Reply by email**. If email is set up, each message is also sent to your inbox, with Reply-To set to the customer so you can answer straight from your email.
+
+To turn on email alerts (via [Resend](https://resend.com), free for low volume):
+
+1. Create a Resend account and an API key, then set `RESEND_API_KEY`.
+2. Set `CONTACT_TO_EMAIL` to the inbox that should get messages (comma-separate several).
+3. Add your domain under **Domains** in Resend and add the DNS records it shows. Then set `CONTACT_FROM_EMAIL`, e.g. `Stardust & Stoneworks <hello@yourdomain.com>`. Until the domain is verified, leave it unset: Resend's test sender only delivers to the email address you signed up to Resend with.
+
+If an email fails, the message is still saved and Admin → Messages shows why. The form allows 5 messages per visitor per 30 minutes.
+
 ## Selling on Etsy and eBay
 
 Connect your accounts under **Admin → Channels**, then push any listing from its edit page. The site stays the source of truth: when you edit a listing here, press **Update** to send the new title, description, price, stock and photos.
