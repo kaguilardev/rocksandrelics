@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Contact · Stardust &amp; Stoneworks</title>
+  <meta name="description" content="Questions about a stone, an order or shipping? Get in touch with Stardust &amp; Stoneworks." />
+  <meta name="theme-color" content="#000000" />
+  <link rel="icon" href="/brand/favicon.png" type="image/png" />
+  <link rel="apple-touch-icon" href="/brand/apple-touch-icon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header id="site-header" class="site-header"></header>
+
+  <main>
+    <section class="page-head">
+      <div class="wrap">
+        <p class="eyebrow reveal">Contact</p>
+        <h1 class="reveal reveal-d1">Say hello <span class="accent">to the studio.</span></h1>
+        <p class="lede reveal reveal-d2">Looking for a particular stone, have a question about an order, or just want to talk crystals? We'd love to hear from you.</p>
+      </div>
+    </section>
+
+    <div class="wrap contact-grid">
+      <div class="panel reveal">
+        <h2 style="font-size:2rem;margin-bottom:1.5rem">Send a message</h2>
+        <form id="contactForm" class="form-grid">
+          <div><label class="lbl" for="cName">Name</label><input class="field" id="cName" name="name" required autocomplete="name" /></div>
+          <div><label class="lbl" for="cEmail">Email</label><input class="field" id="cEmail" name="email" type="email" required autocomplete="email" /></div>
+          <div class="full">
+            <label class="lbl" for="cTopic">What's it about?</label>
+            <select class="field" id="cTopic" name="topic">
+              <option>A stone I'm looking for</option>
+              <option>An existing order</option>
+              <option>Shipping</option>
+              <option>Something else</option>
+            </select>
+          </div>
+          <div class="full"><label class="lbl" for="cMsg">Message</label><textarea class="field" id="cMsg" name="message" required></textarea></div>
+          <div class="full"><button class="btn btn-primary" type="submit">Send message</button><p class="note" id="contactNote" role="status"></p></div>
+        </form>
+      </div>
+
+      <div class="reveal reveal-d1" id="faq">
+        <p class="eyebrow">Good to know</p>
+        <h2 style="font-size:2rem">Questions</h2>
+        <span class="star-rule">✦</span>
+        <div class="faq" style="margin-top:1rem">
+          <details open><summary>Is the stone in the photo the one I get?</summary><p>Yes. Every listing is a single, specific piece photographed as it is, unless the listing says otherwise.</p></details>
+          <details><summary>How do you ship?</summary><p>Every order is hand-wrapped, cushioned and insured. You'll get tracking as soon as it's on its way.</p></details>
+          <details><summary>How should I care for my crystals?</summary><p>Dust gently with a soft dry cloth. Keep softer or coloured stones like amethyst, rose quartz and fluorite out of long direct sunlight so they don't fade.</p></details>
+          <details><summary>Can you find a specific stone for me?</summary><p>Often, yes. Send us a message with what you're hoping for and we'll keep an eye out on our next sourcing trip.</p></details>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer id="site-footer"></footer>
+  <script src="/js/site.js"></script>
+  <script>
+    document.getElementById("contactForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      // TODO: connect to an email service or backend route so messages actually reach the studio.
+      document.getElementById("contactNote").textContent = "Thanks! Your message is on its way. ✦";
+      e.target.reset();
+    });
+  </script>
+</body>
+</html>
