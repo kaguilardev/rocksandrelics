@@ -131,4 +131,4 @@ function startScheduler() {
   setInterval(tick, minutes * 60_000).unref();
 }
 
-module.exports = { runSync, startScheduler, pushQuantity };
+module.exports = { runSync, startScheduler, pushQuantity, applySale };

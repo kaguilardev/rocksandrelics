@@ -34,6 +34,17 @@ Then open http://localhost:3000.
 | `MARKETPLACE_SYNC_MINUTES` | Optional. How often to check Etsy/eBay for new sales (default 10, `0` turns it off) |
 | `MARKETPLACE_SECRET` | Optional. Encrypts stored Etsy/eBay tokens; defaults to `SESSION_SECRET`. Changing it means reconnecting |
 
+## Online checkout (Stripe)
+
+The cart's **Checkout** button sends buyers to a Stripe-hosted payment page. Prices and stock are always re-checked against the database, so a changed cart in the browser can't change what's charged.
+
+1. In the [Stripe Dashboard](https://dashboard.stripe.com/apikeys), copy your **secret key** (`sk_test_…` to test, `sk_live_…` for real sales) into `STRIPE_SECRET_KEY`.
+2. Under **Developers → Webhooks**, add the endpoint `https://YOUR-SITE/api/stripe/webhook` and select the events `checkout.session.completed` and `checkout.session.async_payment_succeeded`. Copy its **signing secret** (`whsec_…`) into `STRIPE_WEBHOOK_SECRET`.
+3. Optional: `STRIPE_SHIPPING_CENTS` (flat shipping per order, e.g. `899`; default free) and `STRIPE_SHIP_COUNTRIES` (comma list, default `US`).
+4. Set `PUBLIC_BASE_URL` so buyers come back to the right address after paying.
+
+When a payment succeeds, the webhook takes the items off stock (marking one-of-a-kind pieces **Sold out**) and passes the new stock to Etsy and eBay. Orders and customer details are in the Stripe Dashboard under **Payments**. Until `STRIPE_SECRET_KEY` is set, the cart shows "Checkout coming soon".
+
 ## Selling on Etsy and eBay
 
 Connect your accounts under **Admin → Channels**, then push any listing from its edit page. The site stays the source of truth: when you edit a listing here, press **Update** to send the new title, description, price, stock and photos.
@@ -51,6 +62,10 @@ Connect your accounts under **Admin → Channels**, then push any listing from i
 4. Turn on Business Policies in your eBay account, then choose shipping, payment and return policies, a ship-from location and a default category.
 5. eBay downloads photos from your site, so the site must be on public **https**. Some categories need *item specifics* (like Color). If a push asks for one, add it in the listing's eBay options.
 
+### Whatnot (CSV export)
+
+Whatnot's Seller API is invite-only, so Whatnot works by file: **Channels → Whatnot → Download Whatnot CSV**, then on whatnot.com go to Seller Hub → Inventory → **Import from CSV**. The file follows Whatnot's US bulk-import template, puts everything under *Rocks & Crystals*, and includes each listing's photos as links. When something sells on Whatnot, lower its stock here: that updates Etsy straight away.
+
 ### Sales sync
 
 Every 10 minutes the server reads new orders from Etsy and eBay:
@@ -61,10 +76,6 @@ Every 10 minutes the server reads new orders from Etsy and eBay:
 - Cancelled orders are ignored, and each order line is only ever counted once.
 
 **Channels → Sales sync** shows recent sales and has a **Sync now** button. Don't also lower stock by hand for a marketplace sale, or it will be counted twice.
-
-### Whatnot (CSV export)
-
-Whatnot's Seller API is invite-only, so Whatnot works by file: **Channels → Whatnot → Download Whatnot CSV**, then on whatnot.com go to Seller Hub → Inventory → **Import from CSV**. The file follows Whatnot's US bulk-import template, puts everything under *Rocks & Crystals*, and includes each listing's photos as links. When something sells on Whatnot, lower its stock here: that updates Etsy straight away.
 
 Notes:
 - Accounts connected before sales sync was added need one **Reconnect**, which grants permission to read orders.

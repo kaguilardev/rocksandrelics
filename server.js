@@ -28,6 +28,8 @@ app.use((_req, res, next) => {
 // Health check for Render
 app.get("/healthz", (_req, res) => res.json({ status: "ok" }));
 
+const checkout = require("./routes/checkout");
+app.use(checkout.webhook); // needs the raw body, so it goes before express.json()
 app.use(express.json({ limit: "200kb" }));
 
 app.use(
@@ -51,6 +53,7 @@ app.use(auth.loadUser);
 app.use(require("./routes/public"));
 app.use(require("./routes/admin"));
 app.use(require("./routes/marketplaces"));
+app.use(checkout.router);
 
 // Admin single-page app
 app.get(["/admin", "/admin/"], (_req, res) => {
