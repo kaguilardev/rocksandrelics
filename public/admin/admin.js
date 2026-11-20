@@ -515,7 +515,8 @@
           </div>
           ${!c.configured ? setupHelp(c.channel) : ""}
           ${c.connected ? `<div class="channel-settings"><p class="muted">Loading ${esc(c.name)} settings…</p></div>` : ""}
-        </div>`).join("")}`;
+        </div>`).join("")}
+      <div class="panel channel" id="whatnot"><p class="muted" style="margin:0">Loading Whatnot…</p></div>`;
 
     main.querySelectorAll(".channel").forEach((box) => {
       const c = channels.find((x) => x.channel === box.dataset.ch);
@@ -539,8 +540,46 @@
         .catch((ex) => { box.querySelector(".channel-settings").innerHTML = `<p class="error">${esc(ex.message)}</p>`; });
     });
 
+    renderWhatnot(main.querySelector("#whatnot")).catch((ex) => { main.querySelector("#whatnot").innerHTML = `<p class="error">${esc(ex.message)}</p>`; });
+
     const salesEl = main.querySelector("#sales");
     if (salesEl) renderSales(salesEl, channels).catch((ex) => { salesEl.innerHTML = `<p class="error">${esc(ex.message)}</p>`; });
+  }
+
+  async function renderWhatnot(el) {
+    const o = await api("/api/admin/marketplaces/whatnot/options");
+    let saved = {};
+    try { saved = JSON.parse(localStorage.getItem("whatnotExport") || "{}"); } catch { /* storage blocked */ }
+    const shipping = saved.shipping || "8-11 oz";
+    el.innerHTML = `
+      <div class="channel-head">
+        <div>
+          <h2 style="margin:0">Whatnot <span class="pill draft">CSV export</span></h2>
+          <p class="muted" style="margin:.2rem 0 0">Whatnot doesn't offer automatic connections yet, so download your listings as a file and import it on Whatnot.</p>
+        </div>
+      </div>
+      <form class="channel-form" id="wnForm" style="margin-top:1rem">
+        <div class="row">
+          <div class="field"><label for="wnType">Listing type</label><select id="wnType" name="type">${o.types.map((t) => `<option${t === saved.type ? " selected" : ""}>${esc(t)}</option>`).join("")}</select><p class="hint">For auctions, your price becomes the starting bid.</p></div>
+          <div class="field"><label for="wnShip">Shipping profile</label><input id="wnShip" name="shipping" list="wnShipList" value="${esc(shipping)}" /><datalist id="wnShipList">${o.shipping_profiles.map((s) => `<option value="${esc(s)}">`).join("")}</datalist><p class="hint">A Whatnot weight band, or the exact name of a custom profile you made on Whatnot. Applies to every row; change single rows in the file if needed.</p></div>
+        </div>
+        <div class="field"><label class="check"><input type="checkbox" name="offerable"${saved.offerable ? " checked" : ""} /> Let buyers make offers (Buy it Now only)</label></div>
+        <div class="field"><label class="check"><input type="checkbox" name="drafts"${saved.drafts ? " checked" : ""} /> Include draft listings (normally only published, in-stock items)</label></div>
+        <button class="btn btn-primary" type="submit">Download Whatnot CSV</button>
+      </form>
+      <div class="setup-help">
+        <p><strong>Then on whatnot.com</strong> (desktop): Seller Hub → <strong>Inventory</strong> → <strong>Import from CSV</strong>. Items arrive as drafts for you to check and publish. Everything goes under ${esc(o.category)}.</p>
+        <p><strong>When something sells on Whatnot</strong>, lower its stock here (or mark it Sold out). That updates Etsy straight away so it can't sell twice.</p>
+        <p>Importing the same file twice creates duplicates on Whatnot, so delete old drafts there before re-importing.</p>
+      </div>`;
+    el.querySelector("#wnForm").onsubmit = (e) => {
+      e.preventDefault();
+      const f = e.target.elements;
+      const opts = { type: f.namedItem("type").value, shipping: f.namedItem("shipping").value.trim(), offerable: f.namedItem("offerable").checked, drafts: f.namedItem("drafts").checked };
+      try { localStorage.setItem("whatnotExport", JSON.stringify(opts)); } catch { /* storage blocked */ }
+      const q = new URLSearchParams({ type: opts.type, shipping: opts.shipping, offerable: opts.offerable ? "1" : "0", drafts: opts.drafts ? "1" : "0" });
+      location.href = `/api/admin/marketplaces/whatnot/export.csv?${q}`;
+    };
   }
 
   async function renderSales(el, channels) {

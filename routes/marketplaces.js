@@ -4,6 +4,7 @@ const auth = require("../auth");
 const store = require("../marketplaces/store");
 const { randomToken } = require("../marketplaces/common");
 const sync = require("../marketplaces/sync");
+const whatnot = require("../marketplaces/whatnot");
 const { query } = require("../db");
 
 const CHANNELS = { etsy: require("../marketplaces/etsy"), ebay: require("../marketplaces/ebay") };
@@ -152,6 +153,29 @@ router.post("/api/admin/marketplaces/ebay/location", auth.requireOwner, wrap(asy
   const key = await CHANNELS.ebay.createLocation(account, req.body || {});
   await store.saveSettings("ebay", { ...CHANNELS.ebay.defaultSettings(), ...account.settings, merchant_location_key: key });
   res.json({ ok: true, key });
+}));
+
+// ---------------- Whatnot (CSV export) ----------------
+router.get("/api/admin/marketplaces/whatnot/options", auth.requireAuth, (_req, res) => {
+  res.json({ types: whatnot.TYPES, shipping_profiles: whatnot.SHIPPING_PROFILES, category: whatnot.CATEGORY });
+});
+
+router.get("/api/admin/marketplaces/whatnot/export.csv", auth.requireAuth, wrap(async (req, res) => {
+  const opts = whatnot.readOptions(req.query);
+  const statuses = opts.includeDrafts ? ["published", "draft"] : ["published"];
+  const { rows: ids } = await query(
+    "SELECT id FROM products WHERE status = ANY($1) AND stock > 0 ORDER BY created_at DESC",
+    [statuses]
+  );
+  const products = [];
+  for (const { id } of ids) products.push(await store.loadProduct(id));
+  const base = baseUrl(req);
+  const csv = whatnot.toCsv(products, opts, (imgId) => `${base}/img/${imgId}?sig=${store.imageSig(imgId)}`);
+  const date = new Date().toISOString().slice(0, 10);
+  res.set("Content-Type", "text/csv; charset=utf-8");
+  res.set("Content-Disposition", `attachment; filename="whatnot-listings-${date}.csv"`);
+  res.set("Cache-Control", "no-store");
+  res.send(csv);
 }));
 
 // ---------------- per-listing ----------------

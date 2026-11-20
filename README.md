@@ -62,6 +62,10 @@ Every 10 minutes the server reads new orders from Etsy and eBay:
 
 **Channels → Sales sync** shows recent sales and has a **Sync now** button. Don't also lower stock by hand for a marketplace sale, or it will be counted twice.
 
+### Whatnot (CSV export)
+
+Whatnot's Seller API is invite-only, so Whatnot works by file: **Channels → Whatnot → Download Whatnot CSV**, then on whatnot.com go to Seller Hub → Inventory → **Import from CSV**. The file follows Whatnot's US bulk-import template, puts everything under *Rocks & Crystals*, and includes each listing's photos as links. When something sells on Whatnot, lower its stock here: that updates Etsy straight away.
+
 Notes:
 - Accounts connected before sales sync was added need one **Reconnect**, which grants permission to read orders.
 - On Render's free plan the server sleeps when idle, so checks pause until someone visits the site. Use a paid instance, or press **Sync now**, if that matters.
