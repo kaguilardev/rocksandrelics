@@ -518,7 +518,7 @@
         </div>`).join("")}
       <div class="panel channel" id="whatnot"><p class="muted" style="margin:0">Loading Whatnot…</p></div>`;
 
-    main.querySelectorAll(".channel").forEach((box) => {
+    main.querySelectorAll(".channel[data-ch]").forEach((box) => {
       const c = channels.find((x) => x.channel === box.dataset.ch);
       const connect = box.querySelector("[data-connect]");
       if (connect) connect.onclick = async () => {
