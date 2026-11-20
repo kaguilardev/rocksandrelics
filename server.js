@@ -63,6 +63,11 @@ app.use(
   express.static(path.join(__dirname, "public"), {
     extensions: ["html"],
     maxAge: isProd ? "1h" : 0,
+    // Pages, styles and scripts change together on each deploy, so always revalidate them
+    // (cheap via ETag) to avoid visitors getting new HTML with stale CSS/JS.
+    setHeaders: (res, filePath) => {
+      if (/\.(html|css|js)$/.test(filePath)) res.setHeader("Cache-Control", "no-cache");
+    },
   })
 );
 
