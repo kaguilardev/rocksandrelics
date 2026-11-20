@@ -46,6 +46,11 @@ const publicLink = (l) => ({
   },
 });
 
+// Whatnot has no account connection, so this must come before the /:channel/options route.
+router.get("/api/admin/marketplaces/whatnot/options", auth.requireAuth, (_req, res) => {
+  res.json({ types: whatnot.TYPES, shipping_profiles: whatnot.SHIPPING_PROFILES, category: whatnot.CATEGORY });
+});
+
 // ---------------- channel accounts ----------------
 router.get("/api/admin/marketplaces", auth.requireAuth, wrap(async (_req, res) => {
   const out = [];
@@ -156,10 +161,6 @@ router.post("/api/admin/marketplaces/ebay/location", auth.requireOwner, wrap(asy
 }));
 
 // ---------------- Whatnot (CSV export) ----------------
-router.get("/api/admin/marketplaces/whatnot/options", auth.requireAuth, (_req, res) => {
-  res.json({ types: whatnot.TYPES, shipping_profiles: whatnot.SHIPPING_PROFILES, category: whatnot.CATEGORY });
-});
-
 router.get("/api/admin/marketplaces/whatnot/export.csv", auth.requireAuth, wrap(async (req, res) => {
   const opts = whatnot.readOptions(req.query);
   const statuses = opts.includeDrafts ? ["published", "draft"] : ["published"];
