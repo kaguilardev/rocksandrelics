@@ -9,7 +9,7 @@
   const STATUSES = [["draft", "Draft (hidden)"], ["published", "Published"], ["sold", "Sold out"]];
   const STYLES = ["amethyst", "aura", "rose", "labradorite", "fluorite", "obsidian", "citrine", "moonstone", "malachite", "galaxy", "tiger", "lapis"];
 
-  const LOGO = `<svg viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2dd4bf"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient></defs><path d="M16 3 L27 11.5 L22 29 L10 29 L5 11.5 Z" fill="none" stroke="url(#lg)" stroke-width="1.8"/><path d="M5 11.5 L27 11.5 M16 3 L12 11.5 L16 29 L20 11.5 Z" fill="none" stroke="url(#lg)" stroke-width="1.1" opacity=".7"/></svg>`;
+  const LOGO = `<img class="brand-mark" src="/brand/geode-mark.png" alt="" width="404" height="172" />`;
 
   // ---------- helpers ----------
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
