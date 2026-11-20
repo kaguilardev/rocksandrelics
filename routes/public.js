@@ -1,5 +1,6 @@
 const express = require("express");
 const { query } = require("../db");
+const { validImageSig } = require("../marketplaces/store");
 
 const router = express.Router();
 
@@ -43,17 +44,20 @@ router.get("/api/products/:slug", async (req, res, next) => {
 router.get("/img/:id", async (req, res, next) => {
   const id = Number.parseInt(req.params.id, 10);
   if (!Number.isInteger(id)) return res.status(400).end();
+  // Signed links let Etsy/eBay fetch photos of listings that are still drafts here.
+  const signed = req.query.sig !== undefined && validImageSig(id, req.query.sig);
   try {
     const { rows } = await query(
-      `SELECT i.mime, i.data FROM product_images i
+      `SELECT i.mime, i.data, p.status FROM product_images i
        JOIN products p ON p.id = i.product_id
        WHERE i.id = $1 AND (p.status IN ('published','sold') OR $2::boolean)`,
-      [id, Boolean(req.user)]
+      [id, Boolean(req.user) || signed]
     );
     if (!rows[0]) return res.status(404).end();
     res.set("Content-Type", rows[0].mime);
     // Images are immutable (replacing a photo creates a new id), so cache hard.
-    res.set("Cache-Control", `${req.user ? "private" : "public"}, max-age=31536000, immutable`);
+    const isPublic = !req.user && (signed || rows[0].status !== "draft");
+    res.set("Cache-Control", `${isPublic ? "public" : "private"}, max-age=31536000, immutable`);
     res.send(rows[0].data);
   } catch (e) {
     next(e);

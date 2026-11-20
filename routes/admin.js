@@ -2,6 +2,7 @@ const express = require("express");
 const multer = require("multer");
 const { query, pool } = require("../db");
 const auth = require("../auth");
+const { pushQuantity } = require("../marketplaces/sync");
 
 const router = express.Router();
 router.use("/api/admin", auth.requireXHR);
@@ -76,7 +77,9 @@ function readProduct(body, partial = false) {
 const ADMIN_PRODUCT_FIELDS = `
   p.*, u.name AS created_by_name,
   COALESCE((SELECT json_agg(json_build_object('id', i.id, 'bytes', i.bytes) ORDER BY i.position, i.id)
-            FROM product_images i WHERE i.product_id = p.id), '[]') AS images`;
+            FROM product_images i WHERE i.product_id = p.id), '[]') AS images,
+  COALESCE((SELECT json_agg(json_build_object('channel', m.channel, 'state', m.state, 'error', m.last_error IS NOT NULL))
+            FROM marketplace_listings m WHERE m.product_id = p.id AND (m.state <> 'none' OR m.last_error IS NOT NULL)), '[]') AS channels`;
 
 // ---------------- session ----------------
 router.post("/api/admin/login", wrap(async (req, res) => {
@@ -148,11 +151,18 @@ router.patch("/api/admin/products/:id", auth.requireAuth, wrap(async (req, res) 
   const keys = Object.keys(data);
   if (!keys.length) return res.json({ ok: true });
   const sets = keys.map((k, i) => `${k} = $${i + 1}`).join(", ");
-  const { rowCount } = await query(
-    `UPDATE products SET ${sets}, updated_at = now() WHERE id = $${keys.length + 1}`,
+  const { rows } = await query(
+    `WITH old AS (SELECT id, stock, status FROM products WHERE id = $${keys.length + 1})
+     UPDATE products p SET ${sets}, updated_at = now() FROM old WHERE p.id = old.id
+     RETURNING old.stock AS old_stock, old.status AS old_status, p.stock, p.status`,
     [...keys.map((k) => data[k]), id]
   );
-  if (!rowCount) return res.status(404).json({ error: "Listing not found." });
+  if (!rows[0]) return res.status(404).json({ error: "Listing not found." });
+  // Stock or sold-out changes made here flow out to Etsy/eBay right away (in the background).
+  const r = rows[0];
+  if (r.old_stock !== r.stock || r.old_status !== r.status) {
+    pushQuantity(id).catch((e) => console.error("Stock sync failed:", e));
+  }
   res.json({ ok: true });
 }));
 

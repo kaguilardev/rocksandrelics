@@ -56,6 +56,50 @@ async function migrate() {
     );
     CREATE INDEX IF NOT EXISTS product_images_product_idx ON product_images(product_id, position);
     CREATE INDEX IF NOT EXISTS products_status_idx ON products(status, created_at DESC);
+
+    -- Connected Etsy / eBay seller accounts (tokens are encrypted at rest)
+    CREATE TABLE IF NOT EXISTS marketplace_accounts (
+      channel        TEXT PRIMARY KEY CHECK (channel IN ('etsy','ebay')),
+      account_name   TEXT NOT NULL DEFAULT '',
+      account_id     TEXT NOT NULL DEFAULT '',
+      tokens         TEXT NOT NULL,
+      settings       JSONB NOT NULL DEFAULT '{}',
+      connected_by   INTEGER REFERENCES users(id) ON DELETE SET NULL,
+      connected_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
+      updated_at     TIMESTAMPTZ NOT NULL DEFAULT now()
+    );
+
+    -- One row per product per marketplace it has been pushed to
+    CREATE TABLE IF NOT EXISTS marketplace_listings (
+      product_id     INTEGER NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+      channel        TEXT NOT NULL CHECK (channel IN ('etsy','ebay')),
+      remote_id      TEXT,
+      remote_url     TEXT,
+      state          TEXT NOT NULL DEFAULT 'none',
+      options        JSONB NOT NULL DEFAULT '{}',
+      last_error     TEXT,
+      last_synced_at TIMESTAMPTZ,
+      PRIMARY KEY (product_id, channel)
+    );
+
+    -- Order sync: where each account's order polling is up to
+    ALTER TABLE marketplace_accounts ADD COLUMN IF NOT EXISTS sync_cursor TIMESTAMPTZ;
+    ALTER TABLE marketplace_accounts ADD COLUMN IF NOT EXISTS last_sync_at TIMESTAMPTZ;
+    ALTER TABLE marketplace_accounts ADD COLUMN IF NOT EXISTS last_sync_error TEXT;
+
+    -- Every marketplace order line we've counted against stock (makes syncing safe to repeat)
+    CREATE TABLE IF NOT EXISTS marketplace_sales (
+      channel     TEXT NOT NULL,
+      line_id     TEXT NOT NULL,
+      order_id    TEXT NOT NULL,
+      product_id  INTEGER REFERENCES products(id) ON DELETE SET NULL,
+      title       TEXT NOT NULL DEFAULT '',
+      quantity    INTEGER NOT NULL,
+      sold_at     TIMESTAMPTZ NOT NULL,
+      created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+      PRIMARY KEY (channel, line_id)
+    );
+    CREATE INDEX IF NOT EXISTS marketplace_sales_recent_idx ON marketplace_sales(sold_at DESC);
   `);
 }
 

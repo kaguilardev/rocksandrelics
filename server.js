@@ -50,6 +50,7 @@ app.use(auth.loadUser);
 
 app.use(require("./routes/public"));
 app.use(require("./routes/admin"));
+app.use(require("./routes/marketplaces"));
 
 // Admin single-page app
 app.get(["/admin", "/admin/"], (_req, res) => {
@@ -75,6 +76,7 @@ app.use((_req, res) => {
 // eslint-disable-next-line no-unused-vars
 app.use((err, _req, res, _next) => {
   if (err && err.code === "LIMIT_FILE_SIZE") return res.status(400).json({ error: "Each photo must be under 4 MB." });
+  if (err && err.expose) return res.status(err.status || 400).json({ error: err.message });
   console.error(err);
   res.status(500).json({ error: "Something went wrong." });
 });
@@ -83,6 +85,7 @@ async function start() {
   if (process.env.DATABASE_URL) {
     await migrate();
     await auth.bootstrapOwner();
+    require("./marketplaces/sync").startScheduler();
   }
   app.listen(PORT, () => console.log(`Stardust & Stoneworks running on http://localhost:${PORT}`));
 }
