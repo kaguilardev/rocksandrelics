@@ -1,6 +1,8 @@
 (() => {
   "use strict";
-  const { FORMS, esc, loadProducts, card, reveal, tilt } = window.SS;
+  const { FORMS, esc, loadProducts, isSold, tilt } = window.SS;
+
+  document.getElementById("year").textContent = new Date().getFullYear();
 
   // Hero logo follows the pointer a little
   const logo = document.getElementById("heroLogo");
@@ -11,37 +13,20 @@
     }, { passive: true });
   }
 
-  // Shop-by-form tiles
-  const formsGrid = document.getElementById("formsGrid");
-  function renderForms(counts = {}) {
-    formsGrid.innerHTML = Object.entries(FORMS).map(([key, f], i) => `
-      <a class="form-card reveal reveal-d${i % 4}" href="/shop?form=${key}" style="--glow:${f.glow}">
-        ${counts[key] ? `<span class="count">${counts[key]} PIECE${counts[key] === 1 ? "" : "S"}</span>` : ""}
-        <span class="gem-wrap"><span class="gem ${f.shape} ${f.style}"></span></span>
-        <h3>${esc(f.label)}</h3>
-        <p>${esc(f.blurb)}</p>
+  // Shop-by-form tiles, each one opens the shop filtered to that form
+  const strip = document.getElementById("formStrip");
+  function render(counts = {}) {
+    strip.innerHTML = Object.entries(FORMS).map(([key, f]) => `
+      <a class="form-tile" href="/shop?form=${key}" style="--glow:${f.glow}">
+        <span class="gem ${f.shape} ${f.style}"></span>
+        <span class="form-tile-text"><strong>${esc(f.label)}</strong><small>${counts[key] ? `${counts[key]} piece${counts[key] === 1 ? "" : "s"}` : esc(f.blurb)}</small></span>
       </a>`).join("");
-    reveal(formsGrid);
-    tilt(formsGrid);
+    tilt(strip);
   }
-  renderForms();
-
-  // Featured carousel
-  const featured = document.getElementById("featured");
-  featured.innerHTML = Array.from({ length: 4 }, () => `<div class="skeleton"></div>`).join("");
+  render();
   loadProducts().then((list) => {
     const counts = {};
-    list.forEach((p) => { if (!window.SS.isSold(p)) counts[p.type] = (counts[p.type] || 0) + 1; });
-    renderForms(counts);
-    const items = list.slice(0, 10);
-    featured.innerHTML = items.length
-      ? items.map(card).join("")
-      : `<div class="empty" style="grid-column:1/-1;min-width:100%"><strong>New pieces are on their way.</strong>Subscribe below to hear when the first collection drops.</div>`;
-    reveal(featured);
-    tilt(featured);
-    document.querySelector(".carousel-nav").hidden = items.length <= 4;
+    list.forEach((p) => { if (!isSold(p)) counts[p.type] = (counts[p.type] || 0) + 1; });
+    render(counts);
   });
-  const step = (dir) => featured.scrollBy({ left: dir * featured.clientWidth * 0.8, behavior: "smooth" });
-  document.getElementById("prevBtn").addEventListener("click", () => step(-1));
-  document.getElementById("nextBtn").addEventListener("click", () => step(1));
 })();

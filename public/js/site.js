@@ -157,7 +157,7 @@
   // ---------- card tilt + glow ----------
   function tilt(root = document) {
     if (reduceMotion || matchMedia("(hover: none)").matches) return;
-    root.querySelectorAll(".card, .form-card").forEach((el) => {
+    root.querySelectorAll(".card, .form-card, .form-tile").forEach((el) => {
       if (el.dataset.tilt) return;
       el.dataset.tilt = "1";
       el.addEventListener("pointermove", (e) => {
